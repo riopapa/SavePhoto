@@ -1,0 +1,61 @@
+<PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:and="http://schemas.android.com/apk/res/android">
+
+    <PreferenceCategory app:title="@string/messages_header"
+        >
+
+<!--        <EditTextPreference-->
+<!--            app:key="signature"-->
+<!--            app:title="@string/signature_title"-->
+<!--            app:useSimpleSummaryProvider="true" />-->
+
+        <ListPreference
+            app:defaultValue="radius"
+            app:entries="@array/radius_values"
+            app:entryValues="@array/radius_values"
+            app:key="radius"
+            app:icon="@mipmap/radius"
+            app:title="@string/radius_title"
+            app:useSimpleSummaryProvider="true" />
+
+        <ListPreference
+            app:defaultValue="zoom"
+            app:entries="@array/zoom_values"
+            app:entryValues="@array/zoom_values"
+            app:key="zoom"
+            app:icon="@mipmap/zoom_level"
+            app:title="@string/zoom_title"
+            app:useSimpleSummaryProvider="true" />
+
+        <ListPreference
+            app:defaultValue="sort"
+            app:entries="@array/sort_values"
+            app:entryValues="@array/sort_values"
+            app:key="sort"
+            app:icon="@mipmap/sort"
+            app:title="@string/sort_title"
+            app:useSimpleSummaryProvider="true" />
+
+        <SwitchPreferenceCompat
+            app:key="autoLoad"
+            app:icon="@mipmap/auto_list"
+            app:title="@string/auto_title" />
+
+    </PreferenceCategory>
+
+<!--    <PreferenceCategory app:title="@string/sync_header">-->
+
+<!--        <SwitchPreferenceCompat-->
+<!--            app:key="sync"-->
+<!--            app:title="@string/sync_title" />-->
+
+<!--        <SwitchPreferenceCompat-->
+<!--            app:dependency="sync"-->
+<!--            app:key="attachment"-->
+<!--            app:summaryOff="@string/attachment_summary_off"-->
+<!--            app:summaryOn="@string/attachment_summary_on"-->
+<!--            app:title="@string/attachment_title" />-->
+
+<!--    </PreferenceCategory>-->
+
+</PreferenceScreen>
