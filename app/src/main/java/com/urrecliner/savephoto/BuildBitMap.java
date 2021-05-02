@@ -25,6 +25,8 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Locale;
 
+import static com.urrecliner.savephoto.Vars.sharedAlpha;
+
 class BuildBitMap {
 
     private long nowTime;
@@ -175,7 +177,7 @@ class BuildBitMap {
         Bitmap sigMap = Bitmap.createScaledBitmap(signatureMap, sigSize, sigSize, false);
         int xPos = width - sigSize - width / 20;
         int yPos = (width>height) ? height/14: height/16;
-        Paint paint = new Paint(); paint.setAlpha(100);
+        Paint paint = new Paint(); paint.setAlpha(Integer.parseInt(sharedAlpha));
         canvas.drawBitmap(sigMap, xPos, yPos, paint);
     }
 

@@ -266,9 +266,7 @@ public class MainActivity extends AppCompatActivity {
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
         utils.log(logID, " new Config " + newConfig.orientation);
-        Toast.makeText(mContext, "curr orentation is " + newConfig.orientation, Toast.LENGTH_SHORT).show();
     }
-
 
     private static final SparseIntArray ORIENTATIONS = new SparseIntArray();
 

@@ -22,6 +22,7 @@ import java.util.Date;
 import java.util.Locale;
 
 import static com.urrecliner.savephoto.Vars.mContext;
+import static com.urrecliner.savephoto.Vars.sharedAlpha;
 import static com.urrecliner.savephoto.Vars.sharedAutoLoad;
 import static com.urrecliner.savephoto.Vars.sharedRadius;
 import static com.urrecliner.savephoto.Vars.sharedSortType;
@@ -118,12 +119,14 @@ class Utils {
             editor.putString("radius", "200");
             editor.putBoolean("autoLoad", true);
             editor.putString("sort", "none");
+            editor.putString("alpha", "163");
             editor.apply();
             editor.commit();
         }
         sharedRadius = sharedPref.getString("radius", "200");
         sharedAutoLoad = sharedPref.getBoolean("autoLoad", false);
         sharedSortType = sharedPref.getString("sort", "none");
+        sharedAlpha = sharedPref.getString("alpha", "163");
     }
 
 //

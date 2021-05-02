@@ -23,6 +23,7 @@ public class Vars {
     static String sharedRadius;
     static boolean sharedAutoLoad;
     static String sharedSortType;
+    static String sharedAlpha;
 
     static Utils utils;
     static Activity mActivity;

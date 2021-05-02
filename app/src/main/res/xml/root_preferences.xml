@@ -41,6 +41,13 @@
             app:icon="@mipmap/auto_list"
             app:title="@string/auto_title" />
 
+        <EditTextPreference
+            app:key="alpha"
+            app:defaultValue="150"
+            app:title="@string/signature_alpha"
+            app:summary="Signature alpha value (255 is full)"
+            app:useSimpleSummaryProvider="true" />
+
     </PreferenceCategory>
 
 <!--    <PreferenceCategory app:title="@string/sync_header">-->
