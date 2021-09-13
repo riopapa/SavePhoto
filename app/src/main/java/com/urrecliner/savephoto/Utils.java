@@ -5,7 +5,13 @@ import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.ColorFilter;
+import android.graphics.EmbossMaskFilter;
+import android.graphics.LightingColorFilter;
+import android.graphics.Matrix;
 import android.graphics.Paint;
+import android.graphics.PathEffect;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
 import android.os.Environment;
@@ -150,7 +156,7 @@ class Utils {
 
         String oldDate = PREFIX + dateFormat.format(System.currentTimeMillis() - 3*24*60*60*1000L);
         File packageDirectory = getPackageDirectory();
-        File[] files = getFilesList(packageDirectory);
+        File[] files = packageDirectory.listFiles();
         Collator myCollator = Collator.getInstance();
         if (files != null) {
             for (File file : files) {
@@ -166,13 +172,28 @@ class Utils {
     Bitmap maskedIcon(int rawId) {
 
         Bitmap bitmap = BitmapFactory.decodeResource(context.getResources(), rawId);
-        Bitmap resultingImage=Bitmap.createBitmap(bitmap.getWidth(), bitmap.getHeight(), bitmap.getConfig());
+        int w = bitmap.getWidth();
+        int h = bitmap.getHeight();
+
+        int[] pixels = new int[w * h];
+        bitmap.getPixels(pixels, 0, w, 0, 0, w, h);
+        for(int x = 0;x < pixels.length;++x){
+            if(pixels[x] != 0){
+                pixels[x] = Color.YELLOW;
+            }
+        }
+
+        Bitmap bm = Bitmap.createBitmap(pixels, w, h, Bitmap.Config.ARGB_8888);
+        Bitmap resultingImage = bm.copy(Bitmap.Config.ARGB_8888, true);
         Paint paint = new Paint();
         Canvas canvas = new Canvas(resultingImage);
-        canvas.drawBitmap(bitmap,3,3,paint);
-        paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.XOR));
-        canvas.drawBitmap(bitmap,0,0,paint);
-        canvas.drawBitmap(bitmap,-3,-3,paint);
+        canvas.drawBitmap(resultingImage, 0, 0, paint);
+
+        Bitmap resizedBitmap = Bitmap.createScaledBitmap(bitmap, w-16, h-16, false);
+//        paint = new Paint();
+////        canvas = new Canvas(resultingImage);
+        paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.DARKEN));
+        canvas.drawBitmap(resizedBitmap,8,8,paint);
         return resultingImage;
     }
 
@@ -187,9 +208,5 @@ class Utils {
 //        }
 //        return (String) (applicationInfo != null ? packageManager.getApplicationLabel(applicationInfo) : "Unknown");
 //    }
-
-    private File[] getFilesList(File fullPath) {
-        return fullPath.listFiles();
-    }
 
 }
