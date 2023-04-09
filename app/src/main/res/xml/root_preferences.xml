@@ -48,6 +48,11 @@
             app:summary="Signature alpha value (255 is full)"
             app:useSimpleSummaryProvider="true" />
 
+
+        <SwitchPreferenceCompat
+            app:key="WithPhoto"
+            app:icon="@drawable/camera"
+            app:title="@string/with_photo" />
     </PreferenceCategory>
 
 <!--    <PreferenceCategory app:title="@string/sync_header">-->

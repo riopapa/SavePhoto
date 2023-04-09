@@ -40,6 +40,7 @@ import static com.urrecliner.savephoto.Vars.sharedRadius;
 import static com.urrecliner.savephoto.Vars.sharedSortType;
 import static com.urrecliner.savephoto.Vars.sharedPref;
 import static com.urrecliner.savephoto.Vars.sharedVoice;
+import static com.urrecliner.savephoto.Vars.sharedWithPhoto;
 
 class Utils {
 
@@ -142,6 +143,7 @@ class Utils {
         sharedAlpha = sharedPref.getString("alpha", "163");
         sharedVoice = sharedPref.getString("voice","");
         sharedLocation = sharedPref.getString("location","");
+        sharedWithPhoto = sharedPref.getBoolean("WithPhoto", true);
     }
 
     void putPlacePreference() {

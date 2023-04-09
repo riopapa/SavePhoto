@@ -17,6 +17,7 @@ import static com.urrecliner.savephoto.Vars.sharedAutoLoad;
 import static com.urrecliner.savephoto.Vars.sharedLocation;
 import static com.urrecliner.savephoto.Vars.sharedRadius;
 import static com.urrecliner.savephoto.Vars.sharedVoice;
+import static com.urrecliner.savephoto.Vars.sharedWithPhoto;
 import static com.urrecliner.savephoto.Vars.strAddress;
 import static com.urrecliner.savephoto.Vars.strPlace;
 import static com.urrecliner.savephoto.Vars.strVoice;
@@ -90,7 +91,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
-
+        setFullScreen();
         currActivity = this.getClass().getSimpleName();
         mActivity = this;
         mContext = getApplicationContext();
@@ -362,7 +363,7 @@ public class MainActivity extends AppCompatActivity {
             mCamera.release();
 
             BuildBitMap buildBitMap = new BuildBitMap(cameraImage, oLatitude, oLongitude, oAltitude, mActivity, mContext, cameraOrientation);
-            buildBitMap.makeOutMap(strVoice, strPlace, strAddress, true);
+            buildBitMap.makeOutMap(strVoice, strPlace, strAddress, sharedWithPhoto);
             return "";
         }
 
@@ -448,6 +449,7 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if (requestCode == ALL_PERMISSIONS_RESULT) {
             for (Object perms : permissionsToRequest) {
                 if (hasPermission((String) perms)) {

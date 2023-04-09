@@ -1,5 +1,7 @@
 package com.urrecliner.savephoto;
 
+import static com.urrecliner.savephoto.Vars.utils;
+
 import android.os.Bundle;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -28,6 +30,7 @@ public class SettingsActivity extends AppCompatActivity {
 
     @Override
     protected void onDestroy() {
+        utils.getPreference();
         super.onDestroy();
     }
 
