@@ -5,7 +5,7 @@
     <item
         android:id="@+id/settings"
         android:orderInCategory="100"
-        android:icon="@mipmap/setting_white"
+        android:icon="@drawable/settings"
         app:showAsAction="always"
         android:title="setting" />
 

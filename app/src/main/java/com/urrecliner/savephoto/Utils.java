@@ -14,9 +14,13 @@ import android.graphics.Paint;
 import android.graphics.PathEffect;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
+import android.os.Build;
 import android.os.Environment;
 import android.preference.PreferenceManager;
 import android.util.Log;
+import android.view.View;
+import android.view.WindowInsets;
+import android.view.WindowInsetsController;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -27,12 +31,15 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 
+import static com.urrecliner.savephoto.Vars.mActivity;
 import static com.urrecliner.savephoto.Vars.mContext;
 import static com.urrecliner.savephoto.Vars.sharedAlpha;
 import static com.urrecliner.savephoto.Vars.sharedAutoLoad;
+import static com.urrecliner.savephoto.Vars.sharedLocation;
 import static com.urrecliner.savephoto.Vars.sharedRadius;
 import static com.urrecliner.savephoto.Vars.sharedSortType;
 import static com.urrecliner.savephoto.Vars.sharedPref;
+import static com.urrecliner.savephoto.Vars.sharedVoice;
 
 class Utils {
 
@@ -127,14 +134,24 @@ class Utils {
             editor.putString("sort", "none");
             editor.putString("alpha", "163");
             editor.apply();
-            editor.commit();
+//            editor.commit();
         }
         sharedRadius = sharedPref.getString("radius", "200");
         sharedAutoLoad = sharedPref.getBoolean("autoLoad", false);
         sharedSortType = sharedPref.getString("sort", "none");
         sharedAlpha = sharedPref.getString("alpha", "163");
+        sharedVoice = sharedPref.getString("voice","");
+        sharedLocation = sharedPref.getString("location","");
     }
 
+    void putPlacePreference() {
+        sharedPref = PreferenceManager.getDefaultSharedPreferences(mContext);
+        SharedPreferences.Editor editor = sharedPref.edit();
+        editor.putString("location", sharedLocation);
+        editor.putString("voice", sharedVoice);
+        editor.apply();
+
+    }
 //
 //    File bitmap2File (String fileName, Bitmap outMap) {
 //        File directory = getPublicCameraDirectory();

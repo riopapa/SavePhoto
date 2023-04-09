@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.hardware.Camera;
+import android.hardware.camera2.CameraDevice;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -24,6 +25,8 @@ public class Vars {
     static boolean sharedAutoLoad;
     static String sharedSortType;
     static String sharedAlpha;
+    static String sharedVoice;
+    static String sharedLocation;
 
     static Utils utils;
     static Activity mActivity;

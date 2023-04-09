@@ -1,9 +1,39 @@
 package com.urrecliner.savephoto;
 
+import static com.urrecliner.savephoto.GPSTracker.oAltitude;
+import static com.urrecliner.savephoto.GPSTracker.oLatitude;
+import static com.urrecliner.savephoto.GPSTracker.oLongitude;
+import static com.urrecliner.savephoto.Vars.NO_MORE_PAGE;
+import static com.urrecliner.savephoto.Vars.byPlaceName;
+import static com.urrecliner.savephoto.Vars.cameraOrientation;
+import static com.urrecliner.savephoto.Vars.currActivity;
+import static com.urrecliner.savephoto.Vars.mActivity;
+import static com.urrecliner.savephoto.Vars.mCamera;
+import static com.urrecliner.savephoto.Vars.mContext;
+import static com.urrecliner.savephoto.Vars.pageToken;
+import static com.urrecliner.savephoto.Vars.placeInfos;
+import static com.urrecliner.savephoto.Vars.placeType;
+import static com.urrecliner.savephoto.Vars.sharedAutoLoad;
+import static com.urrecliner.savephoto.Vars.sharedLocation;
+import static com.urrecliner.savephoto.Vars.sharedRadius;
+import static com.urrecliner.savephoto.Vars.sharedVoice;
+import static com.urrecliner.savephoto.Vars.strAddress;
+import static com.urrecliner.savephoto.Vars.strPlace;
+import static com.urrecliner.savephoto.Vars.strVoice;
+import static com.urrecliner.savephoto.Vars.tvAddress;
+import static com.urrecliner.savephoto.Vars.tvVoice;
+import static com.urrecliner.savephoto.Vars.typeAdapter;
+import static com.urrecliner.savephoto.Vars.typeIcons;
+import static com.urrecliner.savephoto.Vars.typeInfos;
+import static com.urrecliner.savephoto.Vars.typeNames;
+import static com.urrecliner.savephoto.Vars.typeNumber;
+import static com.urrecliner.savephoto.Vars.utils;
+
 import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
@@ -21,15 +51,18 @@ import android.os.Bundle;
 import android.speech.RecognizerIntent;
 import android.util.Log;
 import android.util.SparseIntArray;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.SurfaceView;
 import android.view.View;
-import android.view.Menu;
 import android.view.ViewGroup;
+import android.view.WindowInsets;
+import android.view.WindowInsetsController;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.Toast;
+
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -38,35 +71,6 @@ import java.util.ArrayList;
 import java.util.Locale;
 import java.util.Timer;
 import java.util.TimerTask;
-
-import static com.urrecliner.savephoto.GPSTracker.oAltitude;
-import static com.urrecliner.savephoto.GPSTracker.oLatitude;
-import static com.urrecliner.savephoto.GPSTracker.oLongitude;
-import static com.urrecliner.savephoto.Vars.NO_MORE_PAGE;
-import static com.urrecliner.savephoto.Vars.byPlaceName;
-import static com.urrecliner.savephoto.Vars.placeType;
-import static com.urrecliner.savephoto.Vars.sharedAutoLoad;
-import static com.urrecliner.savephoto.Vars.currActivity;
-import static com.urrecliner.savephoto.Vars.mCamera;
-import static com.urrecliner.savephoto.Vars.mContext;
-import static com.urrecliner.savephoto.Vars.mActivity;
-import static com.urrecliner.savephoto.Vars.placeInfos;
-import static com.urrecliner.savephoto.Vars.pageToken;
-import static com.urrecliner.savephoto.Vars.sharedPref;
-import static com.urrecliner.savephoto.Vars.sharedRadius;
-import static com.urrecliner.savephoto.Vars.tvAddress;
-import static com.urrecliner.savephoto.Vars.tvVoice;
-import static com.urrecliner.savephoto.Vars.typeAdapter;
-import static com.urrecliner.savephoto.Vars.typeIcons;
-import static com.urrecliner.savephoto.Vars.typeInfos;
-import static com.urrecliner.savephoto.Vars.typeNames;
-import static com.urrecliner.savephoto.Vars.typeNumber;
-import static com.urrecliner.savephoto.Vars.utils;
-import static com.urrecliner.savephoto.Vars.strAddress;
-import static com.urrecliner.savephoto.Vars.strPlace;
-import static com.urrecliner.savephoto.Vars.strVoice;
-import static com.urrecliner.savephoto.Vars.cameraOrientation;
-
 
 public class MainActivity extends AppCompatActivity {
 
@@ -85,6 +89,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
 
         currActivity = this.getClass().getSimpleName();
         mActivity = this;
@@ -96,7 +101,14 @@ public class MainActivity extends AppCompatActivity {
         btnShot.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                take_Picture();
+                take_Picture(false);
+            }
+        });
+        ImageView btnShotExit = findViewById(R.id.btnShotExit);
+        btnShotExit.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                take_Picture(true);
             }
         });
 
@@ -139,10 +151,10 @@ public class MainActivity extends AppCompatActivity {
         if (!isNetworkAvailable()) {
             Toast.makeText(mContext, "No Network Available", Toast.LENGTH_LONG).show();
         }
-        tvVoice.setText("");
+        tvVoice.setText(sharedVoice);
         Geocoder geocoder = new Geocoder(this, Locale.KOREA);
         String s = "\n" + GPS2Address.get(geocoder, oLatitude, oLongitude);
-        tvAddress.setText(s);
+        tvAddress.setText(sharedLocation);
         final View v = findViewById(R.id.frame);
         v.post(() -> {
             utils.deleteOldLogFiles();
@@ -183,7 +195,7 @@ public class MainActivity extends AppCompatActivity {
         }
         RecyclerView typeRecyclerView = findViewById(R.id.type_recycler);
         LinearLayoutManager mLinearLayoutManager
-                = new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false);
+                = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
         typeRecyclerView.setLayoutManager(mLinearLayoutManager);
         typeAdapter = new TypeAdapter(typeInfos);
         typeRecyclerView.setAdapter(typeAdapter);
@@ -222,7 +234,6 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-
         mSensorManager.registerListener(deviceOrientation.getEventListener(), mAccelerometer, SensorManager.SENSOR_DELAY_UI);
         mSensorManager.registerListener(deviceOrientation.getEventListener(), mMagnetometer, SensorManager.SENSOR_DELAY_UI);
     }
@@ -277,7 +288,7 @@ public class MainActivity extends AppCompatActivity {
         ORIENTATIONS.append(ExifInterface.ORIENTATION_ROTATE_270, 270);
     }
 
-    private void take_Picture() {
+    private void take_Picture(boolean exitFlag) {
 
         int mDeviceRotation = ORIENTATIONS.get(deviceOrientation.getOrientation());
         if (mDeviceRotation == 0)
@@ -289,13 +300,14 @@ public class MainActivity extends AppCompatActivity {
         else
             cameraOrientation = 8;
 
-        strAddress = tvAddress.getText().toString();
+        sharedLocation = tvAddress.getText().toString();
+
         try {
-            strPlace = strAddress.substring(0, strAddress.indexOf("\n"));
+            strPlace = sharedLocation.substring(0, sharedLocation.indexOf("\n"));
             if (strPlace.equals("")) {
                 strPlace = " ";
             }
-            strAddress = strAddress.substring(strAddress.indexOf("\n") + 1);
+            strAddress = sharedLocation.substring(sharedLocation.indexOf("\n") + 1);
         } catch (Exception e) {
             strPlace = strAddress;
             strAddress = "?";
@@ -304,8 +316,21 @@ public class MainActivity extends AppCompatActivity {
         if (strVoice.length() < 1)
             strVoice = " ";
         tvVoice.setText("");
+        sharedVoice = strVoice;
+        utils.putPlacePreference();
 
         mCamera.takePicture(null, null, rawCallback, jpegCallback); // null is for silent shot
+        if (exitFlag) {
+            Toast.makeText(mContext, "일자 장소가 포함된 사진을 저장 후 종료 됩니다", Toast.LENGTH_SHORT).show();
+            new Timer().schedule(new TimerTask() {
+                public void run() {
+                    android.os.Process.killProcess(android.os.Process.myPid());
+                    System.exit(0);
+                }
+            }, 3000);
+        } else {
+            Toast.makeText(mContext, "계속 해서 사진을 찍을 수 있습니다", Toast.LENGTH_SHORT).show();
+        }
     }
 
     Camera.ShutterCallback shutterCallback = new Camera.ShutterCallback() {
@@ -337,7 +362,7 @@ public class MainActivity extends AppCompatActivity {
             mCamera.release();
 
             BuildBitMap buildBitMap = new BuildBitMap(cameraImage, oLatitude, oLongitude, oAltitude, mActivity, mContext, cameraOrientation);
-            buildBitMap.makeOutMap(strVoice, strPlace, strAddress);
+            buildBitMap.makeOutMap(strVoice, strPlace, strAddress, true);
             return "";
         }
 
@@ -347,32 +372,6 @@ public class MainActivity extends AppCompatActivity {
             strVoice = "";
         }
     }
-
-//    private class MyConnectionCallBack implements GoogleApiClient.ConnectionCallbacks {
-//        public void onConnected(Bundle bundle) {
-//        }
-//
-//        public void onConnectionSuspended(int i) {
-//        }
-//    }
-//
-//    private class MyOnConnectionFailedListener implements GoogleApiClient.OnConnectionFailedListener {
-//        @Override
-//        public void onConnectionFailed(ConnectionResult connectionResult) {
-//            utils.log(logID, "#oF");
-//        }
-//    }
-//
-//    protected void onStart() {
-//        super.onStart();
-////        ready_GoogleAPIClient();
-////        mGoogleApiClient.connect();
-//    }
-//
-//    protected void onStop() {
-////        mGoogleApiClient.disconnect();
-//        super.onStop();
-//    }
 
     public void startCamera() {
 
@@ -390,22 +389,23 @@ public class MainActivity extends AppCompatActivity {
             mCamera = null;
         }
         mCamera = Camera.open(0);
-        try {
-            // camera cameraOrientation
-            mCamera.setDisplayOrientation(90);
-
-        } catch (RuntimeException ex) {
-            Toast.makeText(getApplicationContext(), "camera cameraOrientation " + ex.getMessage(),
-                    Toast.LENGTH_LONG).show();
-            utils.log(logID, "CAMERA not found " + ex.getMessage());
-        }
+//        try {
+//            // camera cameraOrientation
+//            mCamera.setDisplayOrientation(90);
+//
+//        } catch (RuntimeException ex) {
+//            Toast.makeText(getApplicationContext(), "camera cameraOrientation " + ex.getMessage(),
+//                    Toast.LENGTH_LONG).show();
+//            utils.log(logID, "CAMERA not found " + ex.getMessage());
+//        }
         Camera.Parameters params = mCamera.getParameters();
-        params.setRotation(90);
+        params.setRotation(0);
         params.setFocusMode(Camera.Parameters.FOCUS_MODE_AUTO);
         params.setFlashMode(Camera.Parameters.FLASH_MODE_AUTO);
         for (Camera.Size size : params.getSupportedPictureSizes()) {
             float ratio = (float) size.width / (float) size.height;
-            if (ratio > 1.7) {
+            Log.w("size "+ratio,size.width+" x "+size.height);
+            if (size.width >= 1920 && ratio > 1.4 && ratio < 1.8) {
                 params.setPictureSize(size.width, size.height);
                 break;
             }
@@ -484,6 +484,20 @@ public class MainActivity extends AppCompatActivity {
                 .create()
                 .show();
     }
+
+    void setFullScreen() {
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R) {
+            WindowInsetsController controller = null;
+            controller = getWindow().getInsetsController();
+            if (controller != null) {
+                controller.hide(WindowInsets.Type.statusBars() |
+                        WindowInsets.Type.navigationBars());
+                controller.setSystemBarsBehavior(
+                        WindowInsetsController.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE);
+            }
+        }
+    }
+
 
 // ↑ ↑ ↑ ↑ P E R M I S S I O N    RELATED /////// ↑ ↑ ↑
 

@@ -38,7 +38,7 @@
 
         <SwitchPreferenceCompat
             app:key="autoLoad"
-            app:icon="@mipmap/auto_list"
+            app:icon="@drawable/place_list"
             app:title="@string/auto_title" />
 
         <EditTextPreference

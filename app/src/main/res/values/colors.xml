@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="black">#FF000000</color>
-    <color name="infoColor">#FFFFFC3B</color>
+    <color name="infoColor">#F9F8A2</color>
     <color name="placeNameBack">#80B0C2C5</color>
     <color name="placeAddressBack">#80C0D2D5</color>
 
