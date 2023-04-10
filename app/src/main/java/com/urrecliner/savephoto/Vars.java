@@ -28,6 +28,7 @@ public class Vars {
     static String sharedVoice;
     static String sharedLocation;
     static boolean sharedWithPhoto;
+    static boolean sharedRioLogo;
 
     static Utils utils;
     static Activity mActivity;

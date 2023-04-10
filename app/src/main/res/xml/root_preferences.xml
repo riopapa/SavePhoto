@@ -48,11 +48,16 @@
             app:summary="Signature alpha value (255 is full)"
             app:useSimpleSummaryProvider="true" />
 
-
         <SwitchPreferenceCompat
             app:key="WithPhoto"
             app:icon="@drawable/camera"
             app:title="@string/with_photo" />
+
+        <SwitchPreferenceCompat
+            app:key="rioLogo"
+            app:icon="@mipmap/signature"
+            app:title="@string/rio_logo" />
+
     </PreferenceCategory>
 
 <!--    <PreferenceCategory app:title="@string/sync_header">-->

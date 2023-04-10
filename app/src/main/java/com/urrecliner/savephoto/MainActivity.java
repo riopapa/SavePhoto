@@ -77,7 +77,6 @@ public class MainActivity extends AppCompatActivity {
 
     private final static int VOICE_RECOGNISE = 1234;
     private CameraPreview mCameraPreview;
-    private String logID = "main";
 
     private Sensor mAccelerometer;
     private Sensor mMagnetometer;
@@ -99,53 +98,35 @@ public class MainActivity extends AppCompatActivity {
         initiate_Variables();
 
         ImageView btnShot = findViewById(R.id.btnShot);
-        btnShot.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                take_Picture(false);
-            }
-        });
+        btnShot.setOnClickListener(v -> take_Picture(false));
         ImageView btnShotExit = findViewById(R.id.btnShotExit);
-        btnShotExit.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                take_Picture(true);
-            }
-        });
+        btnShotExit.setOnClickListener(v -> take_Picture(true));
 
         new GPSTracker().get();
         startCamera();
 
         ImageView mSpeak = findViewById(R.id.btnSpeak);
-        mSpeak.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startGetVoice();
-            }
-        });
+        mSpeak.setOnClickListener(v -> startGetVoice());
 
         ImageView mPlace = findViewById(R.id.btnPlace);
-        mPlace.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                pageToken = NO_MORE_PAGE;
-                placeInfos = new ArrayList<>();
-                mPlace.setImageResource(typeIcons[typeNumber]);
-                EditText et = findViewById(R.id.placeAddress);
-                String placeName = et.getText().toString();
-                if (placeName != null && placeName.startsWith("?")) {
-                    String[] placeNames = placeName.split("\n");
-                    byPlaceName = placeNames[0].substring(1);
-                } else
-                    byPlaceName = "";
-                new PlaceRetrieve(mContext, oLatitude, oLongitude, placeType, pageToken, sharedRadius, byPlaceName);
-                new Timer().schedule(new TimerTask() {
-                    public void run() {
-                    selectPlace();
-                    mPlace.setImageBitmap(utils.maskedIcon(typeIcons[typeNumber]));
-                    }
-                }, 1500);
-            }
+        mPlace.setOnClickListener(v -> {
+            pageToken = NO_MORE_PAGE;
+            placeInfos = new ArrayList<>();
+            mPlace.setImageResource(typeIcons[typeNumber]);
+            EditText et = findViewById(R.id.placeAddress);
+            String placeName = et.getText().toString();
+            if (placeName.startsWith("?")) {
+                String[] placeNames = placeName.split("\n");
+                byPlaceName = placeNames[0].substring(1);
+            } else
+                byPlaceName = "";
+            new PlaceRetrieve(mContext, oLatitude, oLongitude, placeType, pageToken, sharedRadius, byPlaceName);
+            new Timer().schedule(new TimerTask() {
+                public void run() {
+                selectPlace();
+                mPlace.setImageBitmap(utils.maskedIcon(typeIcons[typeNumber]));
+                }
+            }, 1500);
         });
         mPlace.setImageBitmap(utils.maskedIcon(typeIcons[typeNumber]));
 
@@ -249,12 +230,10 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        Intent intent;
-        switch (item.getItemId()) {
-            case R.id.settings:
-                intent = new Intent(MainActivity.this, SettingsActivity.class);
-                startActivity(intent);
-                return true;
+        if (item.getItemId() == R.id.settings) {
+            Intent intent = new Intent(MainActivity.this, SettingsActivity.class);
+            startActivity(intent);
+            return true;
         }
         return super.onOptionsItemSelected(item);
     }
@@ -277,7 +256,6 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
-        utils.log(logID, " new Config " + newConfig.orientation);
     }
 
     private static final SparseIntArray ORIENTATIONS = new SparseIntArray();
@@ -322,15 +300,13 @@ public class MainActivity extends AppCompatActivity {
 
         mCamera.takePicture(null, null, rawCallback, jpegCallback); // null is for silent shot
         if (exitFlag) {
-            Toast.makeText(mContext, "일자 장소가 포함된 사진을 저장 후 종료 됩니다", Toast.LENGTH_SHORT).show();
+            finish();
             new Timer().schedule(new TimerTask() {
                 public void run() {
                     android.os.Process.killProcess(android.os.Process.myPid());
                     System.exit(0);
                 }
-            }, 3000);
-        } else {
-            Toast.makeText(mContext, "계속 해서 사진을 찍을 수 있습니다", Toast.LENGTH_SHORT).show();
+            }, 2000);
         }
     }
 
@@ -439,7 +415,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private ArrayList findUnAskedPermissions() {
-        ArrayList <String> result = new ArrayList<String>();
+        ArrayList <String> result = new ArrayList<>();
         for (String perm : permissions) if (hasPermission(perm)) result.add(perm);
         return result;
     }
@@ -469,14 +445,9 @@ public class MainActivity extends AppCompatActivity {
         }
     }
     private void showDialog(String msg) {
-        showMessageOKCancel(msg,
-                new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        MainActivity.this.requestPermissions(permissionsRejected.toArray(
-                                new String[0]), ALL_PERMISSIONS_RESULT);
-                    }
-                });
+        showMessageOKCancel(msg, (dialog, which)
+                -> MainActivity.this.requestPermissions(permissionsRejected.toArray(
+                        new String[0]), ALL_PERMISSIONS_RESULT));
     }
     private void showMessageOKCancel(String message, DialogInterface.OnClickListener okListener) {
         new android.app.AlertDialog.Builder(this)
@@ -489,8 +460,7 @@ public class MainActivity extends AppCompatActivity {
 
     void setFullScreen() {
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R) {
-            WindowInsetsController controller = null;
-            controller = getWindow().getInsetsController();
+            WindowInsetsController controller = getWindow().getInsetsController();
             if (controller != null) {
                 controller.hide(WindowInsets.Type.statusBars() |
                         WindowInsets.Type.navigationBars());

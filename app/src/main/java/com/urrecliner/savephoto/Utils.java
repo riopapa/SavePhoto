@@ -37,6 +37,7 @@ import static com.urrecliner.savephoto.Vars.sharedAlpha;
 import static com.urrecliner.savephoto.Vars.sharedAutoLoad;
 import static com.urrecliner.savephoto.Vars.sharedLocation;
 import static com.urrecliner.savephoto.Vars.sharedRadius;
+import static com.urrecliner.savephoto.Vars.sharedRioLogo;
 import static com.urrecliner.savephoto.Vars.sharedSortType;
 import static com.urrecliner.savephoto.Vars.sharedPref;
 import static com.urrecliner.savephoto.Vars.sharedVoice;
@@ -134,6 +135,8 @@ class Utils {
             editor.putBoolean("autoLoad", true);
             editor.putString("sort", "none");
             editor.putString("alpha", "163");
+            editor.putBoolean("WithPhoto", true);
+            editor.putBoolean("rioLogo", true);
             editor.apply();
 //            editor.commit();
         }
@@ -144,6 +147,7 @@ class Utils {
         sharedVoice = sharedPref.getString("voice","");
         sharedLocation = sharedPref.getString("location","");
         sharedWithPhoto = sharedPref.getBoolean("WithPhoto", true);
+        sharedRioLogo = sharedPref.getBoolean("rioLogo", true);
     }
 
     void putPlacePreference() {

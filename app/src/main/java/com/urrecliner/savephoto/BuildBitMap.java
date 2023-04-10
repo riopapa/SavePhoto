@@ -26,6 +26,7 @@ import java.text.SimpleDateFormat;
 import java.util.Locale;
 
 import static com.urrecliner.savephoto.Vars.sharedAlpha;
+import static com.urrecliner.savephoto.Vars.sharedRioLogo;
 
 class BuildBitMap {
 
@@ -180,10 +181,8 @@ class BuildBitMap {
 
     private  void markSignature(int width, int height, Canvas canvas) {
         int sigSizeX = signatureMap.getWidth();
-        int sigSizeY = signatureMap.getHeight();
-//        Bitmap sigMap = Bitmap.createScaledBitmap(signatureMap, sigSizeX, sigSizeY, false);
         int xPos = width - sigSizeX - sigSizeX / 2;
-        int yPos = (width>height) ? height/20: height/22;
+        int yPos = sigSizeX / 4;
         Paint paint = new Paint(); paint.setAlpha(Integer.parseInt(sharedAlpha));
         canvas.drawBitmap(signatureMap, xPos, yPos, null);
     }
@@ -250,11 +249,15 @@ class BuildBitMap {
             sigMap = BitmapFactory.decodeFile(sigFile.toString(), null);
         }
         else
-            sigMap = BitmapFactory.decodeResource(context.getResources(), R.mipmap.digital_logo);
-        Bitmap newBitmap = Bitmap.createBitmap(sigMap.getWidth(), sigMap.getHeight(), Bitmap.Config.ARGB_8888);
-        Canvas canvas = new Canvas(newBitmap);
-        canvas.drawBitmap(sigMap, 0, 0, null);
-        return newBitmap;
+            sigMap = BitmapFactory.decodeResource(context.getResources(),
+                    (sharedRioLogo)? R.mipmap.signature :R.mipmap.digital_logo);
+        int xSize = 320;
+        int ySize = 320 * sigMap.getHeight() / sigMap.getWidth();
+        return Bitmap.createScaledBitmap(sigMap, xSize, ySize, false);
+//
+//        Canvas canvas = new Canvas(newBitmap);
+//        canvas.drawBitmap(sigMap, 0, 0, null);
+//        return newBitmap;
     }
 
     Bitmap rotateBitMap(Bitmap bitmap, int degree) {

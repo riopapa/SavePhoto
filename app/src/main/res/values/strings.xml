@@ -16,6 +16,7 @@
     <string name="sort_title">Sort Sequence</string>
     <string name="signature_alpha">Alpha value (100~255)</string>
     <string name="with_photo">Include original photo</string>
+    <string name="rio_logo">Show Signature</string>
 
     <string name="auto_title">Load PlaceList automatically</string>
     <string name="attachment_title">Download incoming attachments</string>
