@@ -48,24 +48,48 @@
         android:textSize="16sp"
         android:textStyle="bold"
         app:layout_constraintBottom_toTopOf="@id/placeAddress"
-        app:layout_constraintLeft_toRightOf="@id/type_recycler"
-        app:layout_constraintRight_toLeftOf="@id/btnSpeak"
+        app:layout_constraintLeft_toRightOf="@id/btnSpeak"
+        app:layout_constraintRight_toLeftOf="@id/btnShot"
         />
+
+    <ImageView
+        android:id="@+id/logo"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:background="#00000000"
+        android:contentDescription="@string/todo"
+        android:src="@drawable/shot_exit"
+        android:layout_margin="32dp"
+        app:layout_constraintLeft_toRightOf="@id/type_recycler"
+        app:layout_constraintTop_toTopOf="parent"
+        />
+
 
     <ImageButton
         android:id = "@+id/btnSpeak"
-        android:layout_width = "54dp"
-        android:layout_height = "54dp"
-        android:layout_margin = "8sp"
+        android:layout_width = "48dp"
+        android:layout_height = "48dp"
+        android:layout_margin="32dp"
         android:background = "#00000000"
         android:contentDescription = "@string/todo"
         android:src = "@mipmap/micro_phone"
-        app:layout_constraintHorizontal_weight = "1"
-        app:layout_constraintLeft_toRightOf = "@id/textVoice"
-        app:layout_constraintRight_toRightOf = "parent"
-        app:layout_constraintTop_toBottomOf="@id/btnShot"
-        app:layout_constraintBottom_toBottomOf = "@id/textVoice"
+        app:layout_constraintLeft_toRightOf = "@id/type_recycler"
+        app:layout_constraintRight_toLeftOf = "@id/textVoice"
+        app:layout_constraintBottom_toTopOf = "@id/setting"
         app:layout_constraintTop_toTopOf = "@id/textVoice" />
+
+    <ImageView
+        android:id="@+id/setting"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:background="#00000000"
+        android:contentDescription="@string/todo"
+        android:src="@drawable/setting"
+        android:layout_margin="32dp"
+        app:layout_constraintLeft_toRightOf="@id/type_recycler"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintRight_toLeftOf="@id/placeAddress"
+        />
 
     <EditText
         android:id="@+id/placeAddress"
@@ -81,7 +105,7 @@
         android:textStyle="bold"
         android:gravity="center"
         app:layout_constraintHorizontal_weight="6"
-        app:layout_constraintLeft_toRightOf="@id/type_recycler"
+        app:layout_constraintLeft_toRightOf="@id/setting"
         app:layout_constraintRight_toLeftOf="@id/btnPlace"
         app:layout_constraintBottom_toBottomOf="parent"
         />

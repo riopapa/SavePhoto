@@ -15,9 +15,12 @@ import static com.urrecliner.savephoto.Vars.placeInfos;
 import static com.urrecliner.savephoto.Vars.placeType;
 import static com.urrecliner.savephoto.Vars.sharedAutoLoad;
 import static com.urrecliner.savephoto.Vars.sharedLocation;
+import static com.urrecliner.savephoto.Vars.sharedPref;
 import static com.urrecliner.savephoto.Vars.sharedRadius;
+import static com.urrecliner.savephoto.Vars.sharedLogo;
 import static com.urrecliner.savephoto.Vars.sharedVoice;
 import static com.urrecliner.savephoto.Vars.sharedWithPhoto;
+import static com.urrecliner.savephoto.Vars.sigMap;
 import static com.urrecliner.savephoto.Vars.strAddress;
 import static com.urrecliner.savephoto.Vars.strPlace;
 import static com.urrecliner.savephoto.Vars.strVoice;
@@ -34,6 +37,7 @@ import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
@@ -43,8 +47,6 @@ import android.graphics.BitmapFactory;
 import android.hardware.Camera;
 import android.hardware.Sensor;
 import android.hardware.SensorManager;
-import android.location.Geocoder;
-import android.media.ExifInterface;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
@@ -52,8 +54,6 @@ import android.os.Bundle;
 import android.speech.RecognizerIntent;
 import android.util.Log;
 import android.util.SparseIntArray;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.SurfaceView;
 import android.view.View;
 import android.view.ViewGroup;
@@ -64,7 +64,9 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.exifinterface.media.ExifInterface;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -85,22 +87,25 @@ public class MainActivity extends AppCompatActivity {
     static String map_api_key;
     Bitmap cameraImage;
 
+    private boolean exitFlag = false;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
-        setFullScreen();
+//        setFullScreen();
         currActivity = this.getClass().getSimpleName();
         mActivity = this;
         mContext = getApplicationContext();
         askPermission();
         initiate_Variables();
+        setFullScreen();
 
         ImageView btnShot = findViewById(R.id.btnShot);
-        btnShot.setOnClickListener(v -> take_Picture(false));
+        btnShot.setOnClickListener(v -> {exitFlag = false; take_Picture();});
         ImageView btnShotExit = findViewById(R.id.btnShotExit);
-        btnShotExit.setOnClickListener(v -> take_Picture(true));
+        btnShotExit.setOnClickListener(v -> {exitFlag = true; take_Picture();});
 
         new GPSTracker().get();
         startCamera();
@@ -134,8 +139,6 @@ public class MainActivity extends AppCompatActivity {
             Toast.makeText(mContext, "No Network Available", Toast.LENGTH_LONG).show();
         }
         tvVoice.setText(sharedVoice);
-        Geocoder geocoder = new Geocoder(this, Locale.KOREA);
-        String s = "\n" + GPS2Address.get(geocoder, oLatitude, oLongitude);
         tvAddress.setText(sharedLocation);
         final View v = findViewById(R.id.frame);
         v.post(() -> {
@@ -149,6 +152,34 @@ public class MainActivity extends AppCompatActivity {
                 }
             }, 15000);
         }
+
+        show_logo();
+        ImageView ivLogo = findViewById(R.id.logo);
+        ivLogo.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                sharedLogo = (++sharedLogo) % 3;  // logo count
+                SharedPreferences.Editor editor = sharedPref.edit();
+                editor.putInt("logo", sharedLogo);
+                editor.apply();
+                show_logo();
+            }
+        });
+
+        ImageView ivSet = findViewById(R.id.setting);
+        ivSet.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                start_Setting();
+            }
+        });
+
+    }
+
+    private void start_Setting() {
+        Intent intent = new Intent(MainActivity.this, SettingsActivity.class);
+//        startActivityForResult(intent);
+        startActivity(intent);
     }
 
     private void selectPlace() {
@@ -156,6 +187,11 @@ public class MainActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
+    private void show_logo() {
+        sigMap = utils.buildSignatureMap();
+        ImageView iv = findViewById(R.id.logo);
+        iv.setImageBitmap(sigMap);
+    }
     private void initiate_Variables() {
 
         utils = new Utils(this);
@@ -220,22 +256,8 @@ public class MainActivity extends AppCompatActivity {
         mSensorManager.registerListener(deviceOrientation.getEventListener(), mMagnetometer, SensorManager.SENSOR_DELAY_UI);
     }
 
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_main, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        if (item.getItemId() == R.id.settings) {
-            Intent intent = new Intent(MainActivity.this, SettingsActivity.class);
-            startActivity(intent);
-            return true;
-        }
-        return super.onOptionsItemSelected(item);
+    private void startActivityForResult(Intent intent) {
+        show_logo();
     }
 
     private void startGetVoice() {
@@ -267,7 +289,7 @@ public class MainActivity extends AppCompatActivity {
         ORIENTATIONS.append(ExifInterface.ORIENTATION_ROTATE_270, 270);
     }
 
-    private void take_Picture(boolean exitFlag) {
+    private void take_Picture() {
 
         int mDeviceRotation = ORIENTATIONS.get(deviceOrientation.getOrientation());
         if (mDeviceRotation == 0)
@@ -299,15 +321,6 @@ public class MainActivity extends AppCompatActivity {
         utils.putPlacePreference();
 
         mCamera.takePicture(null, null, rawCallback, jpegCallback); // null is for silent shot
-        if (exitFlag) {
-            finish();
-            new Timer().schedule(new TimerTask() {
-                public void run() {
-                    android.os.Process.killProcess(android.os.Process.myPid());
-                    System.exit(0);
-                }
-            }, 2000);
-        }
     }
 
     Camera.ShutterCallback shutterCallback = new Camera.ShutterCallback() {
@@ -347,6 +360,15 @@ public class MainActivity extends AppCompatActivity {
         protected void onPostExecute(String none) {
             startCamera();
             strVoice = "";
+            if (exitFlag) {
+                finish();
+                new Timer().schedule(new TimerTask() {
+                    public void run() {
+                        android.os.Process.killProcess(android.os.Process.myPid());
+                        System.exit(0);
+                    }
+                }, 1000);   // wait while photo generated
+            }
         }
     }
 
@@ -381,7 +403,6 @@ public class MainActivity extends AppCompatActivity {
         params.setFlashMode(Camera.Parameters.FLASH_MODE_AUTO);
         for (Camera.Size size : params.getSupportedPictureSizes()) {
             float ratio = (float) size.width / (float) size.height;
-            Log.w("size "+ratio,size.width+" x "+size.height);
             if (size.width >= 1920 && ratio > 1.4 && ratio < 1.8) {
                 params.setPictureSize(size.width, size.height);
                 break;
@@ -459,17 +480,19 @@ public class MainActivity extends AppCompatActivity {
     }
 
     void setFullScreen() {
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R) {
+//        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R) {
+            ActionBar ab = getSupportActionBar();
+            ab.hide();
             WindowInsetsController controller = getWindow().getInsetsController();
             if (controller != null) {
-                controller.hide(WindowInsets.Type.statusBars() |
-                        WindowInsets.Type.navigationBars());
+                controller.hide(WindowInsets.Type.statusBars());
                 controller.setSystemBarsBehavior(
                         WindowInsetsController.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE);
             }
-        }
+//        }
+//        controller.hide(WindowInsets.Type.statusBars() |
+//                WindowInsets.Type.navigationBars());
     }
-
 
 // ↑ ↑ ↑ ↑ P E R M I S S I O N    RELATED /////// ↑ ↑ ↑
 

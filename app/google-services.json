@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "328159631083",
+    "project_id": "riopapa-firebase",
+    "storage_bucket": "riopapa-firebase.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:328159631083:android:2d7ea1c23215ac0cac90ae",
+        "android_client_info": {
+          "package_name": "com.urrecliner.chattalk"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDQc2uY_VBejM2-Rjiiy8KDsZyygpusFyQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:328159631083:android:b72254f79e8a5bf7ac90ae",
+        "android_client_info": {
+          "package_name": "com.urrecliner.savephoto"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDQc2uY_VBejM2-Rjiiy8KDsZyygpusFyQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

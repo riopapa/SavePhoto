@@ -5,7 +5,6 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.hardware.Camera;
-import android.hardware.camera2.CameraDevice;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -28,7 +27,8 @@ public class Vars {
     static String sharedVoice;
     static String sharedLocation;
     static boolean sharedWithPhoto;
-    static boolean sharedRioLogo;
+    static int sharedLogo;
+    static Bitmap sigMap = null;
 
     static Utils utils;
     static Activity mActivity;

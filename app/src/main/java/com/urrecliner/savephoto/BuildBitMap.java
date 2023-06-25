@@ -4,12 +4,11 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.Paint;
-import android.graphics.Typeface;
+
 import androidx.exifinterface.media.ExifInterface;
 import android.net.Uri;
 import android.os.Build;
@@ -26,7 +25,7 @@ import java.text.SimpleDateFormat;
 import java.util.Locale;
 
 import static com.urrecliner.savephoto.Vars.sharedAlpha;
-import static com.urrecliner.savephoto.Vars.sharedRioLogo;
+import static com.urrecliner.savephoto.Vars.sigMap;
 
 class BuildBitMap {
 
@@ -36,7 +35,7 @@ class BuildBitMap {
     String phonePrefix = "";
     String sFood, sPlace, sAddress, sLatLng;
     double latitude, longitude, altitude;
-    Bitmap outBitmap, signatureMap;
+    Bitmap outBitmap;
     Activity activity;
     Context context;
     int cameraOrientation;
@@ -46,7 +45,6 @@ class BuildBitMap {
         this.outBitmap = outBitmap;
         this.activity = activity;this.context = context;
         this.cameraOrientation = cameraOrientation;
-        this.signatureMap = buildSignatureMap();
         sLatLng = String.format(Locale.ENGLISH, "%.5f, %.5f ; %.1f", latitude, longitude, altitude);
     }
 
@@ -150,7 +148,7 @@ class BuildBitMap {
     private void markFoodPlaceAddress(int width, int height, Canvas canvas) {
 
         int xPos = width / 2;
-        int fontSize = (height + width) / 48;  // gps
+        int fontSize = (height + width) / 64;  // gps
         int yPos = height - fontSize;
         if (width < height)
             yPos -= fontSize;
@@ -166,30 +164,30 @@ class BuildBitMap {
     }
 
     private void markDateTime(long timeStamp, int width, int height, Canvas canvas) {
-        final SimpleDateFormat sdfDate = new SimpleDateFormat("`yy/MM/dd(EEE)", Locale.KOREA);
-        final SimpleDateFormat sdfHourMin = new SimpleDateFormat("HH:mm", Locale.KOREA);
-        int fontSize = (width>height) ? (width+height)/50 : (width+height)/70;  // date time
-        String dateTime = sdfDate.format(timeStamp);
+        final SimpleDateFormat sdfDate = new SimpleDateFormat("`yy/MM/dd", Locale.KOREA);
+        final SimpleDateFormat sdfHourMin = new SimpleDateFormat("HH:mm(EEE)", Locale.KOREA);
+        int fontSize = (width>height) ? (width+height)/70 : (width+height)/100;  // date time
+        String s = sdfDate.format(timeStamp);
         int xPos = (width>height) ? width/10+fontSize: width/6+fontSize;
         int yPos = (width>height) ? height/10: height/12;
-        drawTextOnCanvas(canvas, dateTime, fontSize, xPos, yPos);
-        yPos += fontSize;
-        dateTime = sdfHourMin.format(timeStamp);
-        fontSize = fontSize * 8 / 9;
-        drawTextOnCanvas(canvas, dateTime, fontSize, xPos, yPos);
+        drawTextOnCanvas(canvas, s, fontSize, xPos, yPos);
+        yPos += fontSize * 13 / 10;
+        s = sdfHourMin.format(timeStamp);
+        drawTextOnCanvas(canvas, s, fontSize, xPos, yPos);
     }
 
     private  void markSignature(int width, int height, Canvas canvas) {
-        int sigSizeX = signatureMap.getWidth();
+        int sigSizeX = sigMap.getWidth();
         int xPos = width - sigSizeX - sigSizeX / 2;
-        int yPos = sigSizeX / 4;
+        int yPos = sigSizeX / 3;
         Paint paint = new Paint(); paint.setAlpha(Integer.parseInt(sharedAlpha));
-        canvas.drawBitmap(signatureMap, xPos, yPos, null);
+        canvas.drawBitmap(sigMap, xPos, yPos, null);
     }
 
     private int drawTextOnCanvas(Canvas canvas, String text, int fontSize, int xPos, int yPos) {
         Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
         paint.setTextSize(fontSize);
+        paint.setTextAlign(Paint.Align.CENTER);
         int cWidth = canvas.getWidth() * 3 / 4;
         float tWidth = paint.measureText(text);
         int pos;
@@ -242,23 +240,6 @@ class BuildBitMap {
         }
     }
 
-    Bitmap buildSignatureMap() {
-        Bitmap sigMap;
-        File sigFile = new File (Environment.getExternalStorageDirectory(),"signature.png");
-        if (sigFile.exists()) {
-            sigMap = BitmapFactory.decodeFile(sigFile.toString(), null);
-        }
-        else
-            sigMap = BitmapFactory.decodeResource(context.getResources(),
-                    (sharedRioLogo)? R.mipmap.signature :R.mipmap.digital_logo);
-        int xSize = 320;
-        int ySize = 320 * sigMap.getHeight() / sigMap.getWidth();
-        return Bitmap.createScaledBitmap(sigMap, xSize, ySize, false);
-//
-//        Canvas canvas = new Canvas(newBitmap);
-//        canvas.drawBitmap(sigMap, 0, 0, null);
-//        return newBitmap;
-    }
 
     Bitmap rotateBitMap(Bitmap bitmap, int degree) {
         Matrix matrix = new Matrix();

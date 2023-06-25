@@ -68,6 +68,18 @@
         app:layout_constraintRight_toRightOf = "parent"
         app:layout_constraintTop_toBottomOf = "@id/type_recycler" />
 
+    <ImageView
+        android:id="@+id/setting"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:background="#00000000"
+        android:contentDescription="@string/todo"
+        android:src="@drawable/shot_exit"
+        android:layout_margin="32dp"
+        app:layout_constraintLeft_toRightOf="@id/type_recycler"
+        app:layout_constraintBottom_toBottomOf="parent"
+        />
+
     <EditText
         android:id="@+id/placeAddress"
         android:layout_width="0dp"

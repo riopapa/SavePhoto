@@ -6,21 +6,12 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
-import android.graphics.ColorFilter;
-import android.graphics.EmbossMaskFilter;
-import android.graphics.LightingColorFilter;
-import android.graphics.Matrix;
 import android.graphics.Paint;
-import android.graphics.PathEffect;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
-import android.os.Build;
 import android.os.Environment;
 import android.preference.PreferenceManager;
 import android.util.Log;
-import android.view.View;
-import android.view.WindowInsets;
-import android.view.WindowInsetsController;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -31,13 +22,12 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 
-import static com.urrecliner.savephoto.Vars.mActivity;
 import static com.urrecliner.savephoto.Vars.mContext;
 import static com.urrecliner.savephoto.Vars.sharedAlpha;
 import static com.urrecliner.savephoto.Vars.sharedAutoLoad;
 import static com.urrecliner.savephoto.Vars.sharedLocation;
 import static com.urrecliner.savephoto.Vars.sharedRadius;
-import static com.urrecliner.savephoto.Vars.sharedRioLogo;
+import static com.urrecliner.savephoto.Vars.sharedLogo;
 import static com.urrecliner.savephoto.Vars.sharedSortType;
 import static com.urrecliner.savephoto.Vars.sharedPref;
 import static com.urrecliner.savephoto.Vars.sharedVoice;
@@ -136,7 +126,7 @@ class Utils {
             editor.putString("sort", "none");
             editor.putString("alpha", "163");
             editor.putBoolean("WithPhoto", true);
-            editor.putBoolean("rioLogo", true);
+            editor.putInt("logo", 0);
             editor.apply();
 //            editor.commit();
         }
@@ -144,17 +134,15 @@ class Utils {
         sharedAutoLoad = sharedPref.getBoolean("autoLoad", false);
         sharedSortType = sharedPref.getString("sort", "none");
         sharedAlpha = sharedPref.getString("alpha", "163");
-        sharedVoice = sharedPref.getString("voice","");
         sharedLocation = sharedPref.getString("location","");
         sharedWithPhoto = sharedPref.getBoolean("WithPhoto", true);
-        sharedRioLogo = sharedPref.getBoolean("rioLogo", true);
+        sharedLogo = sharedPref.getInt("logo", 0);
     }
 
     void putPlacePreference() {
         sharedPref = PreferenceManager.getDefaultSharedPreferences(mContext);
         SharedPreferences.Editor editor = sharedPref.edit();
         editor.putString("location", sharedLocation);
-        editor.putString("voice", sharedVoice);
         editor.apply();
 
     }
@@ -231,5 +219,26 @@ class Utils {
 //        }
 //        return (String) (applicationInfo != null ? packageManager.getApplicationLabel(applicationInfo) : "Unknown");
 //    }
+    public Bitmap buildSignatureMap() {
+        int [] logos = {R.mipmap.signature, R.mipmap.digital_logo, R.mipmap.gglogo};
 
+        Bitmap sigMap;
+        File sigFile = new File (Environment.getExternalStorageDirectory(),"signature.png");
+        if (sigFile.exists()) {
+            sigMap = BitmapFactory.decodeFile(sigFile.toString(), null);
+        }
+        else
+            sigMap = BitmapFactory.decodeResource(context.getResources(), logos[sharedLogo]);
+
+        int width = sigMap.getWidth();
+        int height = sigMap.getHeight();
+        Bitmap newMap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(newMap);
+        Paint p = new Paint();
+        p.setAlpha(120);
+        canvas.drawBitmap(sigMap, 0, 0, p);
+        width = 240;
+        height = 240 * sigMap.getHeight() / sigMap.getWidth();
+        return Bitmap.createScaledBitmap(newMap, width, height, false);
+    }
 }
