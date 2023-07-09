@@ -64,6 +64,17 @@
         app:layout_constraintTop_toTopOf="parent"
         />
 
+    <ImageView
+        android:id="@+id/map"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:background="#00000000"
+        android:contentDescription="@string/todo"
+        android:src="@drawable/include_map"
+        android:layout_margin="32dp"
+        app:layout_constraintLeft_toRightOf="@id/type_recycler"
+        app:layout_constraintTop_toBottomOf="@id/logo"
+        />
 
     <ImageButton
         android:id = "@+id/btnSpeak"

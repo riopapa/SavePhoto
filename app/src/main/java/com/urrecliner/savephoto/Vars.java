@@ -15,7 +15,7 @@ public class Vars {
     static String strPlace = null;
     static String strAddress = null;
     static String strVoice = " ";
-
+    static String strDateTime = "\n";
     static Camera mCamera;
 
     /* -- shared Preferences --- */
@@ -28,6 +28,7 @@ public class Vars {
     static String sharedLocation;
     static boolean sharedWithPhoto;
     static int sharedLogo;
+    static boolean sharedMap;
     static Bitmap sigMap = null;
 
     static Utils utils;

@@ -1,5 +1,16 @@
 package com.urrecliner.savephoto;
 
+import static com.urrecliner.savephoto.Vars.mContext;
+import static com.urrecliner.savephoto.Vars.sharedAlpha;
+import static com.urrecliner.savephoto.Vars.sharedAutoLoad;
+import static com.urrecliner.savephoto.Vars.sharedLocation;
+import static com.urrecliner.savephoto.Vars.sharedLogo;
+import static com.urrecliner.savephoto.Vars.sharedMap;
+import static com.urrecliner.savephoto.Vars.sharedPref;
+import static com.urrecliner.savephoto.Vars.sharedRadius;
+import static com.urrecliner.savephoto.Vars.sharedSortType;
+import static com.urrecliner.savephoto.Vars.sharedWithPhoto;
+
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
@@ -21,17 +32,6 @@ import java.text.Collator;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
-
-import static com.urrecliner.savephoto.Vars.mContext;
-import static com.urrecliner.savephoto.Vars.sharedAlpha;
-import static com.urrecliner.savephoto.Vars.sharedAutoLoad;
-import static com.urrecliner.savephoto.Vars.sharedLocation;
-import static com.urrecliner.savephoto.Vars.sharedRadius;
-import static com.urrecliner.savephoto.Vars.sharedLogo;
-import static com.urrecliner.savephoto.Vars.sharedSortType;
-import static com.urrecliner.savephoto.Vars.sharedPref;
-import static com.urrecliner.savephoto.Vars.sharedVoice;
-import static com.urrecliner.savephoto.Vars.sharedWithPhoto;
 
 class Utils {
 
@@ -75,9 +75,13 @@ class Utils {
     private void append2file(String textLine) {
 
         File directory = getPackageDirectory();
+        if (!directory.exists()) {
+            boolean ok = directory.mkdirs();
+            Log.w("Dire",""+ok);
+        }
         BufferedWriter bw = null;
         FileWriter fw = null;
-        String fullName = directory.toString() + "/" + PREFIX + dateFormat.format(new Date())+".txt";
+        String fullName = directory + "/" + PREFIX + dateFormat.format(new Date())+".txt";
         try {
             File file = new File(fullName);
             if (!file.exists()) {
@@ -111,7 +115,7 @@ class Utils {
                 }
             }
         } catch (Exception e) {
-            Log.e("creating Directory error", directory.toString() + "_" + e.toString());
+            Log.e("creating Directory error", directory + "_" + e);
         }
         return directory;
     }
@@ -137,6 +141,7 @@ class Utils {
         sharedLocation = sharedPref.getString("location","");
         sharedWithPhoto = sharedPref.getBoolean("WithPhoto", true);
         sharedLogo = sharedPref.getInt("logo", 0);
+        sharedMap = sharedPref.getBoolean("map", true);
     }
 
     void putPlacePreference() {
@@ -146,22 +151,6 @@ class Utils {
         editor.apply();
 
     }
-//
-//    File bitmap2File (String fileName, Bitmap outMap) {
-//        File directory = getPublicCameraDirectory();
-//        File file = new File(directory, fileName);
-//        FileOutputStream os;
-//        try {
-//            os = new FileOutputStream(file);
-//            outMap.compress(Bitmap.CompressFormat.JPEG, 100, os);
-//            os.close();
-//        } catch (IOException e) {
-//            String logID = "utils";
-//            logE(logID,"Create ioException\n"+e);
-//            return null;
-//        }
-//        return file;
-//    }
 
     void deleteOldLogFiles() {
 

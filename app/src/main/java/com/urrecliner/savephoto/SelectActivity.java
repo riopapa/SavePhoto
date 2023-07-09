@@ -1,5 +1,19 @@
 package com.urrecliner.savephoto;
 
+import static com.urrecliner.savephoto.GPSTracker.oLatitude;
+import static com.urrecliner.savephoto.GPSTracker.oLongitude;
+import static com.urrecliner.savephoto.Vars.NO_MORE_PAGE;
+import static com.urrecliner.savephoto.Vars.byPlaceName;
+import static com.urrecliner.savephoto.Vars.mContext;
+import static com.urrecliner.savephoto.Vars.nowDownLoading;
+import static com.urrecliner.savephoto.Vars.pageToken;
+import static com.urrecliner.savephoto.Vars.placeInfos;
+import static com.urrecliner.savephoto.Vars.placeType;
+import static com.urrecliner.savephoto.Vars.selectActivity;
+import static com.urrecliner.savephoto.Vars.sharedPref;
+import static com.urrecliner.savephoto.Vars.sharedRadius;
+import static com.urrecliner.savephoto.Vars.utils;
+
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.widget.Toast;
@@ -10,20 +24,6 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.Timer;
 import java.util.TimerTask;
-
-import static com.urrecliner.savephoto.GPSTracker.oLatitude;
-import static com.urrecliner.savephoto.GPSTracker.oLongitude;
-import static com.urrecliner.savephoto.Vars.byPlaceName;
-import static com.urrecliner.savephoto.Vars.mContext;
-import static com.urrecliner.savephoto.Vars.placeInfos;
-import static com.urrecliner.savephoto.Vars.NO_MORE_PAGE;
-import static com.urrecliner.savephoto.Vars.nowDownLoading;
-import static com.urrecliner.savephoto.Vars.pageToken;
-import static com.urrecliner.savephoto.Vars.placeType;
-import static com.urrecliner.savephoto.Vars.selectActivity;
-import static com.urrecliner.savephoto.Vars.sharedRadius;
-import static com.urrecliner.savephoto.Vars.sharedPref;
-import static com.urrecliner.savephoto.Vars.utils;
 
 public class SelectActivity extends AppCompatActivity {
 
@@ -47,7 +47,7 @@ public class SelectActivity extends AppCompatActivity {
                         new PlaceRetrieve(mContext, oLatitude, oLongitude, placeType, pageToken, sharedRadius, byPlaceName);
                         new Timer().schedule(new TimerTask() {
                             public void run() {
-                                waitTimer.start();
+                            waitTimer.start();
                             }
                         }, 2000);
                     } else {

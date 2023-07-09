@@ -15,9 +15,10 @@ import static com.urrecliner.savephoto.Vars.placeInfos;
 import static com.urrecliner.savephoto.Vars.placeType;
 import static com.urrecliner.savephoto.Vars.sharedAutoLoad;
 import static com.urrecliner.savephoto.Vars.sharedLocation;
+import static com.urrecliner.savephoto.Vars.sharedLogo;
+import static com.urrecliner.savephoto.Vars.sharedMap;
 import static com.urrecliner.savephoto.Vars.sharedPref;
 import static com.urrecliner.savephoto.Vars.sharedRadius;
-import static com.urrecliner.savephoto.Vars.sharedLogo;
 import static com.urrecliner.savephoto.Vars.sharedVoice;
 import static com.urrecliner.savephoto.Vars.sharedWithPhoto;
 import static com.urrecliner.savephoto.Vars.sigMap;
@@ -78,6 +79,7 @@ import java.util.TimerTask;
 public class MainActivity extends AppCompatActivity {
 
     private final static int VOICE_RECOGNISE = 1234;
+    private final static int SAVE_MAP = 2345;
     private CameraPreview mCameraPreview;
 
     private Sensor mAccelerometer;
@@ -86,6 +88,9 @@ public class MainActivity extends AppCompatActivity {
     private DeviceOrientation deviceOrientation;
     static String map_api_key;
     Bitmap cameraImage;
+    public static Bitmap googleShot = null;
+    public static int zoomValue = 15;
+
 
     private boolean exitFlag = false;
 
@@ -128,8 +133,8 @@ public class MainActivity extends AppCompatActivity {
             new PlaceRetrieve(mContext, oLatitude, oLongitude, placeType, pageToken, sharedRadius, byPlaceName);
             new Timer().schedule(new TimerTask() {
                 public void run() {
-                selectPlace();
-                mPlace.setImageBitmap(utils.maskedIcon(typeIcons[typeNumber]));
+                    selectPlace();
+                    mPlace.setImageBitmap(utils.maskedIcon(typeIcons[typeNumber]));
                 }
             }, 1500);
         });
@@ -163,6 +168,21 @@ public class MainActivity extends AppCompatActivity {
                 editor.putInt("logo", sharedLogo);
                 editor.apply();
                 show_logo();
+            }
+        });
+
+        ImageView ivMap = findViewById(R.id.map);
+        float opacity = (sharedMap) ? 1f: 0.3f;
+        ivMap.setAlpha(opacity);
+        ivMap.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                sharedMap = !sharedMap;
+                SharedPreferences.Editor editor = sharedPref.edit();
+                editor.putBoolean("map", sharedMap);
+                editor.apply();
+                float opacity = (sharedMap) ? 1f: 0.3f;
+                ivMap.setAlpha(opacity);
             }
         });
 
@@ -230,6 +250,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 
+        Log.w("onActivityResult", "requestCode = "+requestCode+" result="+ resultCode);
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == VOICE_RECOGNISE) {
             if (resultCode == RESULT_OK) {
@@ -238,6 +259,22 @@ public class MainActivity extends AppCompatActivity {
                 strVoice = (strVoice + " " + result.get(0)).trim();
                 tvVoice.setText(strVoice);
             }
+        } else if (requestCode == SAVE_MAP) {
+            Log.w("requestCode", " is SAVE_MAP");
+            save_GoogleMap(googleShot, System.currentTimeMillis(), "M");
+            startCamera();
+            strVoice = "";
+            if (exitFlag) {
+                finish();
+                new Timer().schedule(new TimerTask() {
+                    public void run() {
+                        android.os.Process.killProcess(android.os.Process.myPid());
+                        System.exit(0);
+                    }
+                }, 10000);   // wait while photo generated
+            }
+
+
         } else {
             Toast.makeText(mContext, "Request Code:" + requestCode + ", Result Code:" + resultCode + " not as expected", Toast.LENGTH_LONG).show();
         }
@@ -352,24 +389,28 @@ public class MainActivity extends AppCompatActivity {
             mCamera.release();
 
             BuildBitMap buildBitMap = new BuildBitMap(cameraImage, oLatitude, oLongitude, oAltitude, mActivity, mContext, cameraOrientation);
-            buildBitMap.makeOutMap(strVoice, strPlace, strAddress, sharedWithPhoto);
+            buildBitMap.makeOutMap(strVoice, strPlace, strAddress, sharedWithPhoto, System.currentTimeMillis()-2000,"");
             return "";
         }
 
         @Override
         protected void onPostExecute(String none) {
-            startCamera();
-            strVoice = "";
-            if (exitFlag) {
-                finish();
-                new Timer().schedule(new TimerTask() {
-                    public void run() {
-                        android.os.Process.killProcess(android.os.Process.myPid());
-                        System.exit(0);
-                    }
-                }, 1000);   // wait while photo generated
+
+            if (sharedMap) {
+                googleShot = null;
+                Intent intent = new Intent(mContext, LandActivity.class);
+                intent.putExtra("lan", oLatitude);
+                intent.putExtra("lon", oLongitude);
+                intent.putExtra("alt", oAltitude);
+                intent.putExtra("zoom", 15);
+                startActivityForResult(intent, SAVE_MAP);
             }
         }
+    }
+
+    private static void save_GoogleMap(Bitmap googleShot, long nowTime, String M) {
+        BuildBitMap buildBitMap = new BuildBitMap(googleShot, oLatitude, oLongitude, oAltitude, mActivity, mContext, cameraOrientation);
+        buildBitMap.makeOutMap(strVoice, strPlace, strAddress, sharedWithPhoto, nowTime, M);
     }
 
     public void startCamera() {

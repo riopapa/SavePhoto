@@ -2,9 +2,9 @@
 <manifest xmlns:android = "http://schemas.android.com/apk/res/android"
           xmlns:tools = "http://schemas.android.com/tools">
 
+    <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
     <uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE" tools:ignore="ScopedStorage"/>
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
@@ -24,6 +24,10 @@
         android:requestLegacyExternalStorage="true"
         android:theme="@style/Theme.AppCompat"
         >
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="@string/maps_api_key">
+        </meta-data>
         <activity
             android:name=".MainActivity"
             android:screenOrientation="landscape"
@@ -34,6 +38,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity android:name=".LandActivity" />
         <activity android:name=".SelectActivity" />
         <activity android:name=".SettingsActivity" />
 

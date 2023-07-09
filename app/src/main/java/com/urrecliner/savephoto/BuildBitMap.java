@@ -1,5 +1,8 @@
 package com.urrecliner.savephoto;
 
+import static com.urrecliner.savephoto.Vars.sharedAlpha;
+import static com.urrecliner.savephoto.Vars.sigMap;
+
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -8,8 +11,6 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.Paint;
-
-import androidx.exifinterface.media.ExifInterface;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
@@ -17,6 +18,7 @@ import android.util.Log;
 import android.widget.Toast;
 
 import androidx.core.content.ContextCompat;
+import androidx.exifinterface.media.ExifInterface;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -24,16 +26,13 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Locale;
 
-import static com.urrecliner.savephoto.Vars.sharedAlpha;
-import static com.urrecliner.savephoto.Vars.sigMap;
-
 class BuildBitMap {
 
     private long nowTime;
     private static final SimpleDateFormat sdfExif = new SimpleDateFormat("yyyy:MM:dd HH:mm:ss", Locale.KOREA);
     private final SimpleDateFormat sdfFileName = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.KOREA);
     String phonePrefix = "";
-    String sFood, sPlace, sAddress, sLatLng;
+    String sFood, sPlace, sAddress;
     double latitude, longitude, altitude;
     Bitmap outBitmap;
     Activity activity;
@@ -45,12 +44,10 @@ class BuildBitMap {
         this.outBitmap = outBitmap;
         this.activity = activity;this.context = context;
         this.cameraOrientation = cameraOrientation;
-        sLatLng = String.format(Locale.ENGLISH, "%.5f, %.5f ; %.1f", latitude, longitude, altitude);
     }
 
-    void makeOutMap(String sFood, String sName, String sAddress, boolean withPhoto) {
+    void makeOutMap(String sFood, String sName, String sAddress, boolean withPhoto, long nowTime, String suffix) {
         this.sFood = sFood; this.sPlace = sName; this.sAddress = sAddress;
-        nowTime = System.currentTimeMillis();
         int width = outBitmap.getWidth();
         int height = outBitmap.getHeight();
         if (cameraOrientation == 6 && width > height)
@@ -59,24 +56,22 @@ class BuildBitMap {
             outBitmap = rotateBitMap(outBitmap, 90);
         if (cameraOrientation == 3)
             outBitmap = rotateBitMap(outBitmap, 180);
-//        if (Build.MODEL.equals("nexus 6P"))
-//            phonePrefix = "IMG_";
 
-        if (withPhoto) {
-            String outFileName = sdfFileName.format(nowTime);
-            File newFile = new File(getPublicCameraDirectory(), phonePrefix + outFileName + ".jpg");
+        if (withPhoto && suffix.length() == 0) {    // no suffix
+            String outFileName = sdfFileName.format(nowTime) + suffix;
+            File newFile = new File(getPublicCameraDirectory(), phonePrefix + outFileName + suffix + ".jpg");
             writeCameraFile(outBitmap, newFile);
             setNewFileExif(newFile);
             activity.sendBroadcast(new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, Uri.fromFile(newFile)));
         }
 
-        Bitmap mergedMap = markDateLocSignature(outBitmap, nowTime);
+        Bitmap mergedMap = markDateLocSignature(outBitmap, nowTime, suffix);
         nowTime += 150;
         String foodName = sFood.trim();
         if (foodName.length() > 2)
             foodName = "(" + foodName +")";
         String outFileName2 = sdfFileName.format(nowTime) + "_" + sPlace + foodName;
-        File newFile2 = new File(getPublicCameraDirectory(), phonePrefix + outFileName2 + " _ha.jpg");
+        File newFile2 = new File(getPublicCameraDirectory(), phonePrefix + outFileName2 + " _ha"+suffix+".jpg");
         writeCameraFile(mergedMap, newFile2);
         setNewFileExif(newFile2);
         activity.sendBroadcast(new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, Uri.fromFile(newFile2)));
@@ -133,14 +128,15 @@ class BuildBitMap {
         return ""+((altitude > 0) ? altitude:-altitude);
     }
 
-    Bitmap markDateLocSignature(Bitmap photoMap, long timeStamp) {
+    Bitmap markDateLocSignature(Bitmap photoMap, long timeStamp, String suffix) {
         int photoWidth = photoMap.getWidth();
         int photoHeight = photoMap.getHeight();
         Bitmap newMap = Bitmap.createBitmap(photoWidth, photoHeight, photoMap.getConfig());
         Canvas canvas = new Canvas(newMap);
         canvas.drawBitmap(photoMap, 0f, 0f, null);
         markDateTime(timeStamp, photoWidth, photoHeight, canvas);
-        markSignature(photoWidth, photoHeight, canvas);
+        if (suffix.length() == 0)
+            markSignature(photoWidth, photoHeight, canvas);
         markFoodPlaceAddress(photoWidth, photoHeight, canvas);
         return newMap;
     }
