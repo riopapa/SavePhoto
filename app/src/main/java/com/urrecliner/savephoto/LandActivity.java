@@ -12,9 +12,8 @@ import android.graphics.Paint;
 import android.graphics.Path;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.WindowInsets;
-import android.view.WindowInsetsController;
 
+import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -36,13 +35,8 @@ import com.google.android.gms.maps.model.MarkerOptions;
 
         setContentView(R.layout.activity_land);
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
-        WindowInsetsController controller = getWindow().getInsetsController();
-        if (controller != null) {
-            controller.hide(WindowInsets.Type.statusBars() | WindowInsets.Type.navigationBars());
-            controller.setSystemBarsBehavior(
-                    WindowInsetsController.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE);
-        }
-
+        ActionBar actionBar = getSupportActionBar();
+        actionBar.hide();
 
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
@@ -66,27 +60,13 @@ import com.google.android.gms.maps.model.MarkerOptions;
 
     @Override
     public void onMapLoaded() {     // if map is displayed then try snapshot
-        Log.w("onMapLoaded ", "onMapLoaded");
         mGoogleMap.snapshot(callback);
-//        Timer waiting = new Timer();
-//        final TimerTask waitTask = new TimerTask() {
-//            @Override
-//            public void run() {
-//                if (mGoogleMap != null) {
-//                    Log.w("onMapLoaded "+i, "mGoogleMap not null");
-//                    waiting.cancel();
-//                }
-//                i = i++;
-//                Log.w("onMapLoaded "+i, System.currentTimeMillis()+"");
-//            }
-//        };
-//        waiting.schedule(waitTask, 500, 300);
     }
 
     GoogleMap.SnapshotReadyCallback callback = new GoogleMap.SnapshotReadyCallback() {
         @Override
         public void onSnapshotReady(Bitmap snapshot) {
-            MainActivity.googleShot = snapshot;
+            MainActivity.googleShot = mergeScaleBitmap(snapshot, getScaleMap(zoomValue));
             finish();
         }
     };
@@ -134,27 +114,4 @@ import com.google.android.gms.maps.model.MarkerOptions;
         canvas.drawText(xUnit, baseX + 20, baseY - yHeight - 10, paint);
         return bitmap;
     }
-
-//    public void takeScreenShot(View view) {
-//
-////        utils.log(logID, "callback rootview ///");
-//
-//        final View rootView = view;
-//
-//        Handler handler = new Handler();
-//        handler.postDelayed(new Runnable() {
-//            public void run() {
-//                File screenShot = utils.captureMapScreen(rootView);
-//                if (screenShot != null) {
-//                    utils.setPhotoTag(screenShot);
-//                    mActivity.sendBroadcast(new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, Uri.fromFile(screenShot)));
-//                    mActivity.finishAffinity();
-//                    android.os.Process.killProcess(android.os.Process.myPid());
-//                    System.exit(0);
-//                } else {
-//                    utils.logE(logID,"Screenshot is NULL");
-//                }
-//            }
-//        }, 300);
-//    }
 }

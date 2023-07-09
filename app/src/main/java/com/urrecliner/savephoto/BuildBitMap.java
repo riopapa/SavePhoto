@@ -59,7 +59,7 @@ class BuildBitMap {
 
         if (withPhoto && suffix.length() == 0) {    // no suffix
             String outFileName = sdfFileName.format(nowTime) + suffix;
-            File newFile = new File(getPublicCameraDirectory(), phonePrefix + outFileName + suffix + ".jpg");
+            File newFile = new File(getPublicCameraDirectory(), phonePrefix + outFileName + ".jpg");
             writeCameraFile(outBitmap, newFile);
             setNewFileExif(newFile);
             activity.sendBroadcast(new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, Uri.fromFile(newFile)));
@@ -71,7 +71,7 @@ class BuildBitMap {
         if (foodName.length() > 2)
             foodName = "(" + foodName +")";
         String outFileName2 = sdfFileName.format(nowTime) + "_" + sPlace + foodName;
-        File newFile2 = new File(getPublicCameraDirectory(), phonePrefix + outFileName2 + " _ha"+suffix+".jpg");
+        File newFile2 = new File(getPublicCameraDirectory(), phonePrefix + outFileName2 + suffix + "_ha.jpg");
         writeCameraFile(mergedMap, newFile2);
         setNewFileExif(newFile2);
         activity.sendBroadcast(new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, Uri.fromFile(newFile2)));

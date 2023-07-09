@@ -91,7 +91,7 @@ public class MainActivity extends AppCompatActivity {
     public static Bitmap googleShot = null;
     public static int zoomValue = 15;
 
-
+    private static long now_time;
     private boolean exitFlag = false;
 
     @Override
@@ -181,7 +181,7 @@ public class MainActivity extends AppCompatActivity {
                 SharedPreferences.Editor editor = sharedPref.edit();
                 editor.putBoolean("map", sharedMap);
                 editor.apply();
-                float opacity = (sharedMap) ? 1f: 0.3f;
+                float opacity = (sharedMap) ? 1f: 0.2f;
                 ivMap.setAlpha(opacity);
             }
         });
@@ -250,7 +250,6 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 
-        Log.w("onActivityResult", "requestCode = "+requestCode+" result="+ resultCode);
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == VOICE_RECOGNISE) {
             if (resultCode == RESULT_OK) {
@@ -260,23 +259,29 @@ public class MainActivity extends AppCompatActivity {
                 tvVoice.setText(strVoice);
             }
         } else if (requestCode == SAVE_MAP) {
-            Log.w("requestCode", " is SAVE_MAP");
-            save_GoogleMap(googleShot, System.currentTimeMillis(), "M");
-            startCamera();
-            strVoice = "";
-            if (exitFlag) {
-                finish();
-                new Timer().schedule(new TimerTask() {
-                    public void run() {
-                        android.os.Process.killProcess(android.os.Process.myPid());
-                        System.exit(0);
-                    }
-                }, 10000);   // wait while photo generated
-            }
-
+            save_GoogleMap(googleShot);
+            checkIfExit();
 
         } else {
             Toast.makeText(mContext, "Request Code:" + requestCode + ", Result Code:" + resultCode + " not as expected", Toast.LENGTH_LONG).show();
+        }
+    }
+
+    private void checkIfExit() {
+        startCamera();
+        strVoice = "";
+        if (exitFlag) {
+            finish();
+            Intent intent = new Intent(Intent.ACTION_PICK,android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+            intent.setType("image/gallery");
+            intent.setAction(Intent.ACTION_PICK);
+            startActivity(intent);
+            new Timer().schedule(new TimerTask() {
+                public void run() {
+                    android.os.Process.killProcess(android.os.Process.myPid());
+                    System.exit(0);
+                }
+            }, 5000);   // wait while photo generated
         }
     }
 
@@ -388,8 +393,9 @@ public class MainActivity extends AppCompatActivity {
             mCamera.stopPreview();
             mCamera.release();
 
+            now_time = System.currentTimeMillis();
             BuildBitMap buildBitMap = new BuildBitMap(cameraImage, oLatitude, oLongitude, oAltitude, mActivity, mContext, cameraOrientation);
-            buildBitMap.makeOutMap(strVoice, strPlace, strAddress, sharedWithPhoto, System.currentTimeMillis()-2000,"");
+            buildBitMap.makeOutMap(strVoice, strPlace, strAddress, sharedWithPhoto, now_time,"");
             return "";
         }
 
@@ -404,13 +410,15 @@ public class MainActivity extends AppCompatActivity {
                 intent.putExtra("alt", oAltitude);
                 intent.putExtra("zoom", 15);
                 startActivityForResult(intent, SAVE_MAP);
+            } else {
+                checkIfExit();
             }
         }
     }
 
-    private static void save_GoogleMap(Bitmap googleShot, long nowTime, String M) {
+    private static void save_GoogleMap(Bitmap googleShot) {
         BuildBitMap buildBitMap = new BuildBitMap(googleShot, oLatitude, oLongitude, oAltitude, mActivity, mContext, cameraOrientation);
-        buildBitMap.makeOutMap(strVoice, strPlace, strAddress, sharedWithPhoto, nowTime, M);
+        buildBitMap.makeOutMap(strVoice, strPlace, strAddress, sharedWithPhoto, now_time, "Map");
     }
 
     public void startCamera() {
