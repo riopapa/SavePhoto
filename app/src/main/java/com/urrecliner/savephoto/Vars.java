@@ -29,6 +29,8 @@ public class Vars {
     static boolean sharedWithPhoto;
     static int sharedLogo;
     static boolean sharedMap;
+
+    static int sharedCamera;
     static Bitmap sigMap = null;
 
     static Utils utils;

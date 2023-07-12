@@ -14,6 +14,7 @@ import static com.urrecliner.savephoto.Vars.pageToken;
 import static com.urrecliner.savephoto.Vars.placeInfos;
 import static com.urrecliner.savephoto.Vars.placeType;
 import static com.urrecliner.savephoto.Vars.sharedAutoLoad;
+import static com.urrecliner.savephoto.Vars.sharedCamera;
 import static com.urrecliner.savephoto.Vars.sharedLocation;
 import static com.urrecliner.savephoto.Vars.sharedLogo;
 import static com.urrecliner.savephoto.Vars.sharedMap;
@@ -298,10 +299,6 @@ public class MainActivity extends AppCompatActivity {
         mSensorManager.registerListener(deviceOrientation.getEventListener(), mMagnetometer, SensorManager.SENSOR_DELAY_UI);
     }
 
-    private void startActivityForResult(Intent intent) {
-        show_logo();
-    }
-
     private void startGetVoice() {
         Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
         intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL,
@@ -436,7 +433,7 @@ public class MainActivity extends AppCompatActivity {
             mCamera.release();
             mCamera = null;
         }
-        mCamera = Camera.open(0);
+        mCamera = Camera.open(sharedCamera);
 //        try {
 //            // camera cameraOrientation
 //            mCamera.setDisplayOrientation(90);
